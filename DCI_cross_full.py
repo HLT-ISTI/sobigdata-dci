@@ -129,10 +129,26 @@ def DCI_cross_full(source_train_filename,
         print(f'test time = {test_time:.5f} secs', file=reportfile)
         print(file=reportfile)
 
-        y_pred_clf = pd.Series([id_to_label[1] if y > 0.5 else id_to_label[0] for y in predictions],
-                               name='Predicted')
-        df_confusion_clf = pd.crosstab(target_y_str, y_pred_clf, margins=True)
-        print(df_confusion_clf, file=reportfile)
+        pp = 0
+        pn = 0
+        np = 0
+        nn = 0
+        y_pred_clf = [id_to_label[1] if y > 0.5 else id_to_label[0] for y in predictions]
+        for real, pred in zip(target_y_str, y_pred_clf):
+            if real == id_to_label[0]:
+                if real == pred:
+                    pp += 1
+                else:
+                    pn += 1
+            else:
+                if real == pred:
+                    nn += 1
+                else:
+                    np += 1
+        print(f'Real/Predicted\t{id_to_label[0]}\t{id_to_label[1]}', file=reportfile)
+        print(f'{id_to_label[0]}\t{pp}\t{pn}\t{pp + pn}', file=reportfile)
+        print(f'{id_to_label[1]}\t{np}\t{nn}\t{np + nn}', file=reportfile)
+        print(f'            \t{pp + np}\t{pn + nn}\t{pp + pn + np + nn}', file=reportfile)
         print(file=reportfile)
         print(classification_report(target_y, predictions > 0.5, target_names=id_to_label), file=reportfile)
 
